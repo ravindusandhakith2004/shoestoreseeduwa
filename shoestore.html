@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shoe Store Inventory System</title>
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .role-selector {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px;
+        }
+        
+        .role-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .role-btn.stock-manager {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            color: white;
+        }
+        
+        .role-btn.owner {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+        }
+        
+        .role-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .interface {
+            display: none;
+            padding: 30px;
+        }
+        
+        .interface.active {
+            display: block;
+        }
+        
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 5px solid #3498db;
+        }
+        
+        .form-section h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        
+        .form-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .form-group input, .form-group select {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        .btn.success {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+        }
+        
+        .btn.danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+        
+        .items-table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        
+        .items-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .items-table th {
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .items-table td {
+            padding: 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .items-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+        }
+        
+        .current-date {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .current-user {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .pending-count {
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            padding: 5px 10px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+.footer{
+      background: linear-gradient(50deg, #ccd9f5,  #e9f5cc,#d1ccf5);
+      padding: 10px;
+      max-width: auto;
+      margin: auto;
+      background:;
+      border-radius: 20px;
+      box-shadow: 0 0 20px yellow;
+      text-align: center;
+      font-family:arial;
+      font-size:1rem;
+      backdrop-filter: blur(90px);
+    }
+
+}
+    </style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>👞👟👠👡👢</h1>
+<h1>K.R.P.SHOE PLAZAAA-SEEDUWA</h1>
+<h5>RLS solution✨</h5>
+</div>
+<!-- Login Interface -->
+<div class="interface active" id="login-interface">
+<div class="form-section">
+<h3>🔐 Login to Access System</h3>
+<form id="login-form">
+<div class="form-group">
+<input id="username" placeholder="Username" required="" type="text"/>
+<input id="password" placeholder="Password" required="" type="password"/>
+</div>
+<button class="btn" type="submit">Login</button>
+<div id="login-error" style="color: #e74c3c; margin-top: 10px; display: none;">
+                        Invalid username or password. Please try again.
+                    </div>
+</form>
+</div>
+</div>
+<!-- Role Display (shown after login) -->
+<div id="role-display" style="display: none;">
+<div class="current-user" style="text-align: center; padding: 20px; background: #f8f9fa; margin: 0 30px; border-radius: 10px;">
+<span id="current-user-info"></span>
+<button class="btn danger" onclick="logout()" style="margin-left: 20px; font-size: 0.9em; padding: 8px 16px;">Logout</button>
+</div>
+</div>
+<!-- Stock Manager Interface -->
+<div class="interface" id="stock-manager-interface">
+<div class="current-date" id="current-date"></div>
+<div class="form-section">
+<h3>💰 Record Daily Sales</h3>
+<form id="sales-form">
+<div class="form-group">
+<select id="sale-item" required="">
+<option value="">Select Item Sold</option>
+</select>
+<input id="sale-qty" min="1" placeholder="Quantity Sold" required="" type="number"/>
+<input id="sale-price" min="0" placeholder="Sale Price per Unit ($)" required="" step="0.01" type="number"/>
+</div>
+<div class="form-group">
+<input id="customer-name" placeholder="Customer Name (optional)" type="text"/>
+<input id="sale-notes" placeholder="Notes (optional)" type="text"/>
+</div>
+<button class="btn" type="submit">Record Sale</button>
+</form>
+</div>
+<div class="form-section">
+<h3>📊 End of Day Stock Report</h3>
+<div class="form-group">
+<select id="eod-item" required="">
+<option value="">Select Item</option>
+</select>
+<input id="eod-qty" min="0" placeholder="Current Stock Count" required="" type="number"/>
+<input id="eod-notes" placeholder="Notes (optional)" type="text"/>
+</div>
+<button class="btn" onclick="submitEODReport()" type="button">Submit EOD Report</button>
+</div>
+<div class="form-section">
+<h3>💾 Upload Backup to Google Sheets</h3>
+<button class="btn success" onclick="uploadSalesToGoogleSheets()" type="button">📤 Upload Sales to Google Sheets</button>
+</div>
+<div class="items-table">
+<h3 style="padding: 20px; margin: 0; background: #ecf0f1; color: #2c3e50;">💰 Today's Sales</h3>
+<table>
+<thead>
+<tr>
+<th>Item Name</th>
+<th>Qty Sold</th>
+<th>Sale Price</th>
+<th>Total</th>
+<th>Customer</th>
+<th>Time</th>
+</tr>
+</thead>
+<tbody id="sales-table">
+<!-- Sales will be populated here -->
+</tbody>
+</table>
+</div>
+<div class="items-table">
+<h3 style="padding: 20px; margin: 0; background: #ecf0f1; color: #2c3e50;">📋 Available Items</h3>
+<table>
+<thead>
+<tr>
+<th>Item Name</th>
+<th>Available Stock</th>
+<th>Price</th>
+</tr>
+</thead>
+<tbody id="available-items-table">
+<!-- Available items will be populated here -->
+</tbody>
+</table>
+</div>
+</div>
+<!-- Owner Interface -->
+<div class="interface" id="owner-interface">
+<div class="current-date" id="owner-current-date"></div>
+<div class="form-section">
+<h3>📝 Add New Item to Inventory</h3>
+<form id="add-item-form">
+<div class="form-group">
+<input id="item-name" placeholder="Item Name (e.g., Nike Air Max)" required="" type="text"/>
+<input id="item-qty" min="0" placeholder="Quantity" required="" type="number"/>
+<input id="item-price" min="0" placeholder="Price ($)" required="" step="0.01" type="number"/>
+</div>
+<button class="btn" type="submit">Add Item to Inventory</button>
+</form>
+</div>
+<div class="form-section">
+<h3>🎯 Pending EOD Reports <span class="pending-count" id="pending-count">0</span></h3>
+<div class="items-table">
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Item Name</th>
+<th>Reported Stock</th>
+<th>Notes</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="pending-reports-table">
+<!-- Pending reports will be populated here -->
+</tbody>
+</table>
+</div>
+</div>
+<div class="form-section">
+<h3>💾 Upload Backups to Google Sheets</h3>
+<div style="display: flex; gap: 15px;">
+<button class="btn success" onclick="uploadSalesToGoogleSheets()" type="button">📤 Upload Sales to Google Sheets</button>
+<button class="btn success" onclick="uploadInventoryToGoogleSheets()" type="button">📤 Upload Inventory to Google Sheets</button>
+</div>
+</div>
+<div class="items-table">
+<h3 style="padding: 20px; margin: 0; background: #ecf0f1; color: #2c3e50;">💰 All Sales Records</h3>
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Time</th>
+<th>Item</th>
+<th>Qty Sold</th>
+<th>Sale Price</th>
+<th>Total</th>
+<th>Customer</th>
+<th>Sold By</th>
+</tr>
+</thead>
+<tbody id="all-sales-table">
+<!-- All sales will be populated here -->
+</tbody>
+</table>
+</div>
+<div class="items-table">
+<h3 style="padding: 20px; margin: 0; background
+
+: #ecf0f1; color: #2c3e50;">📊 Complete Inventory Database</h3>
+<table>
+<thead>
+<tr>
+<th>Date Added</th>
+<th>Item Name</th>
+<th>Initial Qty</th>
+<th>Current Stock</th>
+<th>Price</th>
+<th>Total Sold</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody id="complete-database-table">
+<!-- Complete database will be populated here -->
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="notification" id="notification"></div>
+<script>
+        // Data storage (in a real application, this would be a database)
+        let stockItems = [];
+        let eodReports = [];
+        let completeDatabase = [];
+        let salesRecords = [];
+        let currentUser = null;
+        
+        // User credentials
+        const users = {
+            'userkrp': {
+                password: 'thusharikrp',
+                role: 'stock-manager',
+                name: 'Stock Manager'
+            },
+            'rls17344': {
+                password: '200413805192',
+                role: 'owner',
+                name: 'Owner'
+            }
+        };
+
+        // Google Sheets API configuration
+        const SPREADSHEET_ID = 'YOUR_SPREADSHEET_ID'; // Replace with actual Google Spreadsheet ID
+        const API_KEY = 'YOUR_API_KEY'; // Replace with actual Google API key
+        const SALES_SHEET = 'Sales'; // Name of the sheet for sales data
+        const INVENTORY_SHEET = 'Inventory'; // Name of the sheet for inventory data
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDateTime();
+            setInterval(updateDateTime, 60000); // Update every minute
+            
+            // Set up form submissions
+            document.getElementById('login-form').addEventListener('submit', handleLogin);
+            document.getElementById('add-item-form').addEventListener('submit', addItem);
+            document.getElementById('sales-form').addEventListener('submit', recordSale);
+            
+            // Show login interface by default
+            showLoginInterface();
+        });
+        
+        function updateDateTime() {
+            const now = new Date();
+            const dateString = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            const timeString = now.toLocaleTimeString('en-US');
+            
+            document.getElementById('current-date').textContent = `${dateString} - ${timeString}`;
+            document.getElementById('owner-current-date').textContent = `${dateString} - ${timeString}`;
+        }
+        
+        function showLoginInterface() {
+            // Hide all interfaces
+            document.querySelectorAll('.interface').forEach(el => el.classList.remove('active'));
+            document.getElementById('role-display').style.display = 'none';
+            
+            // Show login interface
+            document.getElementById('login-interface').classList.add('active');
+        }
+        
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('login-error');
+            
+            // Validate credentials
+            if (users[username] && users[username].password === password) {
+                currentUser = {
+                    username: username,
+                    role: users[username].role,
+                    name: users[username].name
+                };
+                
+                // Hide login interface
+                document.getElementById('login-interface').classList.remove('active');
+                
+                // Show role display and appropriate interface
+                document.getElementById('role-display').style.display = 'block';
+                document.getElementById('current-user-info').textContent = 
+                    `Logged in as: ${currentUser.name} (${username})`;
+                
+                // Switch to appropriate role interface
+                switchRole(currentUser.role);
+                
+                // Clear login form
+                document.getElementById('login-form').reset();
+                errorDiv.style.display = 'none';
+                
+                showNotification(`Welcome ${currentUser.name}!`, 'success');
+            } else {
+                // Show error message
+                errorDiv.style.display = 'block';
+                document.getElementById('password').value = ''; // Clear password field
+            }
+        }
+        
+        function logout() {
+            currentUser = null;
+            showLoginInterface();
+            showNotification('Logged out successfully!', 'success');
+        }
+        
+        function switchRole(role) {
+            // Security check - ensure user can only access their assigned role
+            if (currentUser && currentUser.role !== role) {
+                showNotification('Access denied!', 'error');
+                return;
+            }
+            
+            // Hide all interfaces except login and role display
+            document.querySelectorAll('.interface').forEach(el => {
+                if (el.id !== 'login-interface') {
+                    el.classList.remove('active');
+                }
+            });
+            
+            // Show selected interface
+            document.getElementById(role + '-interface').classList.add('active');
+            
+            // Update data displays
+            if (role === 'stock-manager') {
+                displayAvailableItems();
+                displayTodaySales();
+                updateSaleSelect();
+                updateEODSelect();
+            } else if (role === 'owner') {
+                displayPendingReports();
+                displayCompleteDatabase();
+                displayAllSales();
+            }
+        }
+        
+        function addItem(e) {
+            e.preventDefault();
+            
+            // Security check - only owner can add items
+            if (!currentUser || currentUser.role !== 'owner') {
+                showNotification('Access denied! Only owner can add new items.', 'error');
+                return;
+            }
+            
+            const itemName = document.getElementById('item-name').value;
+            const qty = parseInt(document.getElementById('item-qty').value);
+            const price = parseFloat(document.getElementById('item-price').value);
+            
+            const now = new Date();
+            const item = {
+                id: Date.now(),
+                name: itemName,
+                quantity: qty,
+                initialQuantity: qty,
+                price: price,
+                dateAdded: now.toLocaleDateString(),
+                timeAdded: now.toLocaleTimeString(),
+                status: 'Active',
+                addedBy: currentUser.username,
+                totalSold: 0
+            };
+            
+            stockItems.push(item);
+            completeDatabase.push({...item});
+            
+            // Reset form
+            document.getElementById('add-item-form').reset();
+            
+            // Update displays
+            displayCompleteDatabase();
+            
+            showNotification('Item added to inventory successfully!', 'success');
+        }
+        
+        function recordSale(e) {
+            e.preventDefault();
+            
+            // Security check - only stock manager can record sales
+            if (!currentUser || currentUser.role !== 'stock-manager') {
+                showNotification('Access denied!', 'error');
+                return;
+            }
+            
+            const itemId = document.getElementById('sale-item').value;
+            const qtySold = parseInt(document.getElementById('sale-qty').value);
+            const salePrice = parseFloat(document.getElementById('sale-price').value);
+            const customerName = document.getElementById('customer-name').value || 'Walk-in Customer';
+            const notes = document.getElementById('sale-notes').value;
+            
+            if (!itemId || isNaN(qtySold) || isNaN(salePrice)) {
+                alert('Please fill all required fields');
+                return;
+            }
+            
+            const item = stockItems.find(i => i.id == itemId);
+            if (!item) {
+                alert('Item not found');
+                return;
+            }
+            
+            if (item.quantity < qtySold) {
+                alert(`Not enough stock! Available: ${item.quantity}`);
+                return;
+            }
+            
+            const now = new Date();
+            const sale = {
+                id: Date.now(),
+                itemId: itemId,
+                itemName: item.name,
+                qtySold: qtySold,
+                salePrice: salePrice,
+                totalAmount: qtySold * salePrice,
+                customerName: customerName,
+                notes: notes,
+                date: now.toLocaleDateString(),
+                time: now.toLocaleTimeString(),
+                soldBy: currentUser.username
+            };
+            
+            salesRecords.push(sale);
+            
+            // Update item quantity in both arrays
+            item.quantity -= qtySold;
+            const dbItem = completeDatabase.find(i => i.id == itemId);
+            if (dbItem) {
+                dbItem.quantity -= qtySold;
+                dbItem.totalSold = (dbItem.totalSold || 0) + qtySold;
+            }
+            
+            // Reset form
+            document.getElementById('sales-form').reset();
+            
+            // Update displays
+            displayTodaySales();
+            displayAvailableItems();
+            updateSaleSelect();
+            
+            showNotification(`Sale recorded! Total: ${sale.totalAmount.toFixed(2)}`, 'success');
+        }
+        
+        function displayAvailableItems() {
+            const tbody = document.getElementById('available-items-table');
+            
+            tbody.innerHTML = stockItems.map(item => `
+                <tr>
+                    <td>${item.name}</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.price.toFixed(2)}</td>
+                </tr>
+            `).join('');
+        }
+        
+        function displayTodaySales() {
+            const tbody = document.getElementById('sales-table');
+            const today = new Date().toLocaleDateString();
+            
+            const todaySales = salesRecords.filter(sale => sale.date === today);
+            
+            tbody.innerHTML = todaySales.map(sale => `
+                <tr>
+                    <td>${sale.itemName}</td>
+                    <td>${sale.qtySold}</td>
+                    <td>${sale.salePrice.toFixed(2)}</td>
+                    <td>${sale.totalAmount.toFixed(2)}</td>
+                    <td>${sale.customerName}</td>
+                    <td>${sale.time}</td>
+                </tr>
+            `).join('');
+        }
+        
+        function displayAllSales() {
+            const tbody = document.getElementById('all-sales-table');
+            
+            tbody.innerHTML = salesRecords.map(sale => `
+                <tr>
+                    <td>${sale.date}</td>
+                    <td>${sale.time}</td>
+                    <td>${sale.itemName}</td>
+                    <td>${sale.qtySold}</td>
+                    <td>${sale.salePrice.toFixed(2)}</td>
+                    <td>${sale.totalAmount.toFixed(2)}</td>
+                    <td>${sale.customerName}</td>
+                    <td>${sale.soldBy}</td>
+                </tr>
+            `).join('');
+        }
+        
+        function updateSaleSelect() {
+            const select = document.getElementById('sale-item');
+            select.innerHTML = '<option value="">Select Item Sold</option>';
+            
+            stockItems.forEach(item => {
+                if (item.quantity > 0) {
+                    select.innerHTML += `<option value="${item.id}">${item.name} (Stock: ${item.quantity})</option>`;
+                }
+            });
+        }
+        
+        function updateEODSelect() {
+            const select = document.getElementById('eod-item');
+            select.innerHTML = '<option value="">Select Item</option>';
+            
+            stockItems.forEach(item => {
+                select.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            });
+        }
+        
+        function submitEODReport() {
+            // Security check - only stock manager can submit EOD reports
+            if (!currentUser || currentUser.role !== 'stock-manager') {
+                showNotification('Access denied!', 'error');
+                return;
+            }
+            
+            const itemId = document.getElementById('eod-item').value;
+            const qty = parseInt(document.getElementById('eod-qty').value);
+            const notes = document.getElementById('eod-notes').value;
+            
+            if (!itemId || isNaN(qty)) {
+                alert('Please select an item and enter quantity');
+                return;
+            }
+            
+            const item = stockItems.find(i => i.id == itemId);
+            const report = {
+                id: Date.now(),
+                itemId: itemId,
+                itemName: item.name,
+                reportedStock: qty,
+                notes: notes,
+                date: new Date().toLocaleDateString(),
+                time: new Date().toLocaleTimeString(),
+                status: 'Pending',
+                submittedBy: currentUser.username
+            };
+            
+            eodReports.push(report);
+            
+            // Clear form
+            document.getElementById('eod-item').value = '';
+            document.getElementById('eod-qty').value = '';
+            document.getElementById('eod-notes').value = '';
+            
+            showNotification('EOD Report submitted successfully!', 'success');
+        }
+        
+        function approveReport(reportId) {
+            // Security check - only owner can approve reports
+            if (!currentUser || currentUser.role !== 'owner') {
+                showNotification('Access denied!', 'error');
+                return;
+            }
+            
+            const report = eodReports.find(r => r.id === reportId);
+            if (report) {
+                report.status = 'Approved';
+                report.approvedBy = currentUser.username;
+                report.approvedDate = new Date().toLocaleDateString();
+                
+                // Update the item quantity in the database
+                const item = completeDatabase.find(i => i.id == report.itemId);
+                if (item) {
+                    item.quantity = report.reportedStock;
+                }
+                
+                // Also update in stockItems for stock manager view
+                const stockItem = stockItems.find(i => i.id == report.itemId);
+                if (stockItem) {
+                    stockItem.quantity = report.reportedStock;
+                }
+                
+                displayPendingReports();
+                displayCompleteDatabase();
+                showNotification('Report approved and database updated!', 'success');
+            }
+        }
+        
+        function rejectReport(reportId) {
+            // Security check - only owner can reject reports
+            if (!currentUser || currentUser.role !== 'owner') {
+                showNotification('Access denied!', 'error');
+                return;
+            }
+            
+            const report = eodReports.find(r => r.id === reportId);
+            if (report) {
+                report.status = 'Rejected';
+                report.rejectedBy = currentUser.username;
+                report.rejectedDate = new Date().toLocaleDateString();
+                
+                displayPendingReports();
+                showNotification('Report rejected!', 'success');
+            }
+        }
+        
+        function displayCompleteDatabase() {
+            const tbody = document.getElementById('complete-database-table');
+            
+            tbody.innerHTML = completeDatabase.map(item => `
+                <tr>
+                    <td>${item.dateAdded}</td>
+                    <td>${item.name}</td>
+                    <td>${item.initialQuantity}</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.price.toFixed(2)}</td>
+                    <td>${item.totalSold || 0}</td>
+                    <td><span class="status-badge status-approved">${item.status}</span></td>
+                </tr>
+            `).join('');
+        }
+        
+        async function uploadSalesToGoogleSheets() {
+            try {
+                const now = new Date();
+                const values = [
+                    ['SHOE STORE SALES BACKUP'],
+                    [`Generated: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`],
+                    [`Generated by: ${currentUser.name} (${currentUser.username})`],
+                    [''],
+                    ['Date', 'Time', 'Item', 'Qty', 'Price', 'Total', 'Customer', 'Sold By'],
+                    ...salesRecords.map(sale => [
+                        sale.date,
+                        sale.time,
+                        sale.itemName,
+                        sale.qtySold,
+                        sale.salePrice.toFixed(2),
+                        sale.totalAmount.toFixed(2),
+                        sale.customerName,
+                        sale.soldBy
+                    ]),
+                    [''],
+                    [`TOTAL SALES: ${salesRecords.length} transactions`],
+                    [`TOTAL REVENUE: ${salesRecords.reduce((sum, sale) => sum + sale.totalAmount, 0).toFixed(2)}`]
+                ];
+
+                // Clear existing data and update sheet
+                const clearResponse = await fetch(
+                    `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SALES_SHEET}!A1:Z?valueInputOption=RAW`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${API_KEY}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ values: [[]] })
+                    }
+                );
+
+                if (!clearResponse.ok) throw new Error('Failed to clear sheet');
+
+                const response = await fetch(
+                    `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${SALES_SHEET}!A1?valueInputOption=RAW`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${API_KEY}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ values })
+                    }
+                );
+
+                if (response.ok) {
+                    showNotification('Sales data uploaded to Google Sheets successfully!', 'success');
+                } else {
+                    throw new Error('Failed to upload sales data');
+                }
+            } catch (error) {
+                showNotification('Error uploading sales data to Google Sheets', 'error');
+                console.error(error);
+            }
+        }
+        
+        async function uploadInventoryToGoogleSheets() {
+            try {
+                const now = new Date();
+                const values = [
+                    ['SHOE STORE INVENTORY BACKUP'],
+                    [`Generated: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`],
+                    [`Generated by: ${currentUser.name} (${currentUser.username})`],
+                    [''],
+                    ['Date Added', 'Item Name', 'Initial Qty', 'Current Stock', 'Price', 'Total Sold', 'Status'],
+                    ...completeDatabase.map(item => [
+                        item.dateAdded,
+                        item.name,
+                        item.initialQuantity,
+                        item.quantity,
+                        item.price.toFixed(2),
+                        item.totalSold || 0,
+                        item.status
+                    ]),
+                    [''],
+                    [`TOTAL ITEMS: ${completeDatabase.length}`],
+                    [`TOTAL INVENTORY VALUE: ${completeDatabase.reduce((sum, item) => sum + (item.quantity * item.price), 0).toFixed(2)}`]
+                ];
+
+                // Clear existing data and update sheet
+                const clearResponse = await fetch(
+                    `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${INVENTORY_SHEET}!A1:Z?valueInputOption=RAW`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${API_KEY}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ values: [[]] })
+                    }
+                );
+
+                if (!clearResponse.ok) throw new Error('Failed to clear sheet');
+
+                const response = await fetch(
+                    `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${INVENTORY_SHEET}!A1?valueInputOption=RAW`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${API_KEY}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ values })
+                    }
+                );
+
+                if (response.ok) {
+                    showNotification('Inventory data uploaded to Google Sheets successfully!', 'success');
+                } else {
+                    throw new Error('Failed to upload inventory data');
+                }
+            } catch (error) {
+                showNotification('Error uploading inventory data to Google Sheets', 'error');
+                console.error(error);
+            }
+        }
+        
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<div class="footer">
+<p> <b>©️All right reserved                  |  &amp;nbspravindu.l.sandhakith   |                KRP-Team </b></p><br/>
+<p>Tel-0727110077 0777168415</p>
+</div>
+
+<script>
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyrmKPBpKb6AwVEsM1InmND9EOW1ld1IsSX0TpId35Yq-7RpaYrvxPEBlNve0ZzNS2P/exec'; // Replace with your actual Web App URL
+
+function recordSale(data) {
+  fetch(WEB_APP_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      sheet: 'Sales',
+      date: data.date,
+      time: data.time,
+      itemName: data.itemName,
+      qtySold: data.qtySold,
+      salePrice: data.salePrice,
+      totalAmount: data.totalAmount,
+      customerName: data.customerName,
+      soldBy: data.soldBy
+    })
+  }).then(response => response.text())
+    .then(result => console.log('Sales upload:', result))
+    .catch(error => console.error('Error uploading sales:', error));
+}
+
+function addItem(data) {
+  fetch(WEB_APP_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      sheet: 'Inventory',
+      dateAdded: data.dateAdded,
+      itemName: data.itemName,
+      initialQuantity: data.initialQuantity,
+      quantity: data.quantity,
+      price: data.price,
+      totalSold: data.totalSold,
+      status: data.status
+    })
+  }).then(response => response.text())
+    .then(result => console.log('Inventory upload:', result))
+    .catch(error => console.error('Error uploading inventory:', error));
+}
+</script>
+
+<script>
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyrmKPBpKb6AwVEsM1InmND9EOW1ld1IsSX0TpId35Yq-7RpaYrvxPEBlNve0ZzNS2P/exec';
+
+function recordSale(data) {
+  fetch(WEB_APP_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sheet: 'Sales', ...data })
+  })
+  .then(response => response.text())
+  .then(result => {
+    alert("Sale data uploaded successfully.");
+  })
+  .catch(error => {
+    alert("Failed to upload sale data.");
+    console.error(error);
+  });
+}
+
+function addItem(data) {
+  fetch(WEB_APP_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sheet: 'Inventory', ...data })
+  })
+  .then(response => response.text())
+  .then(result => {
+    alert("Inventory data uploaded successfully.");
+  })
+  .catch(error => {
+    alert("Failed to upload inventory data.");
+    console.error(error);
+  });
+}
+
+// Hook into existing form handlers
+document.addEventListener("DOMContentLoaded", function() {
+  const saleForm = document.getElementById("saleForm");
+  if (saleForm) {
+    saleForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+      const sale = {
+        date: document.getElementById("saleDate").value,
+        time: document.getElementById("saleTime").value,
+        itemName: document.getElementById("itemName").value,
+        qtySold: document.getElementById("qtySold").value,
+        salePrice: document.getElementById("salePrice").value,
+        totalAmount: document.getElementById("totalAmount").value,
+        customerName: document.getElementById("customerName").value,
+        soldBy: document.getElementById("soldBy").value
+      };
+      recordSale(sale);
+    });
+  }
+
+  const inventoryForm = document.getElementById("inventoryForm");
+  if (inventoryForm) {
+    inventoryForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+      const item = {
+        dateAdded: document.getElementById("dateAdded").value,
+        itemName: document.getElementById("inventoryItemName").value,
+        initialQuantity: document.getElementById("initialQuantity").value,
+        quantity: document.getElementById("quantity").value,
+        price: document.getElementById("price").value,
+        totalSold: document.getElementById("totalSold").value,
+        status: document.getElementById("status").value
+      };
+      addItem(item);
+    });
+  }
+});
+</script>
+
+</body>
+</html>
